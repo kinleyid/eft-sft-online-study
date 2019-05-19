@@ -2,7 +2,10 @@
 /*
 To do:
 
-Decide how to randomize conditions
+Balance number of questions across conditions: maybe remove questions about people
+Add arithmetic filler for sft group?
+Decide how to handle dates:
+	Treat Jan 8, 2020 as the first week of classes
 Pilot/proofread
 Add autonoesis questions?
 Write R code to analyze data
@@ -15,12 +18,21 @@ Conditions:
 3 = episodic specificity
 */
 
-var participant_id;
-var condition = 1;
-var slider_width = '200px';
+var pIDdigs = 100000000;
+var participant_id = Math.floor(pIDdigs + Math.random() * (9 * pIDdigs - 1));
+var condition = Math.floor(1 + Math.random() * 3); // 1, 2, or 3
+var slider_width = '200px'; // Slider width for visual analog scales
+
+// Time between today and first week of classes:
+var today = new Date();
+var fweek = new Date('1/8/2020');
+var diffTime = Math.abs(fweek.getTime() - today.getTime());
+var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+var diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)); 
+
 var timeline = [];
 
-timeline.push({
+timeline.push({ // Set the user's screen to fullscreen
 	type: 'fullscreen',
 	fullscreen_mode: true
 });
@@ -48,7 +60,8 @@ var dd_instructions = {
 	pages: [
 		'Now you will make a series of monetary choices',
 		'You will be asked whether you would prefer some amount of money now or another amount later',
-		'Click the option that you would choose'
+		'Click the option that you would choose',
+		'Do not think too hard, just go with your gut'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000
@@ -56,7 +69,7 @@ var dd_instructions = {
 var dd_data = {
 	immediate_value: 50,
 	delayed_value: 100,
-	delay_text: 'in 10 weeks',
+	delay_text: 'in ' + diffDays + ' days',
 	immediate_text: 'now',
 	div_pre: '<div style="height: 100px; width: 150px;">',
 	trial_count: 0,
@@ -122,13 +135,13 @@ var EFT_instructions = {
 		{
 			type: 'instructions',
 			pages: [
-				'Please think of an event that might happen to you in the first week of classes in the fall semester.',
+				'Please think of an event that might happen to you in the first week of classes in the upcoming winter semester.',
 				'This should be a single event that, if it happens, will happen at a specific time and place.',
+				'The event should not be something that has already happened',
 				'The event can last a few minutes or hours but not longer than a day.',
-				'The event must also involve at least one other person and should not have happened yet.',
 				'Examples of bad events:</br>1. Commuting to school (Has already happened many times)</br>2. Going to classes (Not specific and takes more than a day)</br>3. Friend starting classes at a different university (Not an event that happens to you)',
 				'Examples of good events:</br>1. Attending my first lecture</br>2. Moving into a new apartment</br>3. Meeting up with someone to buy a used textbook',
-				'Once you have an event in mind that:</br></br>1. Could realistically happen in the first week of winter classes</br>2. Happens at a specific time</br>3. Happens at a specific place</br>3. Involves other people</br>4. Does not last longer than a day</br>5. Has not happened yet</br></br>Click "next"'
+				'Once you have an event in mind that:</br></br>1. Could realistically happen in the first week of the upcoming winter semester</br>2. Happens at a specific time</br>3. Happens at a specific place</br>3. Does not last longer than a day</br>4. Has not happened yet</br></br>Click "next"'
 			],
 			show_clickable_nav: true
 		},
@@ -141,47 +154,38 @@ var EFT_instructions = {
 var SFT_instructions = {
 	type: 'instructions',
 	pages: [
-		'Please think about the first week of classes in the winter semester',
+		'Please think about the first week of classes in the upcoming winter semester',
 		'Do not think about any event in particular',
-		'You will be asked a series of questions about this time of year'
+		'You will be asked a series of questions about this upcoming time of year'
 	],
 	show_clickable_nav: true
 };
 var EFT_specificity_prompts = [
-	'Close your eyes and think about the location of the event. Think about how things look and how objects are arranged. Once you have a very good picture of the surroundings, write every detail you can (even details that do not seem important):',
-	'Please write more about the objects in the location:',
-	'Please write more about how objects in the location are arranged:',
-	'Please write more about the appearance of the location:',
-	'Please close your eyes and think about the people in the event. Think about what they look like and what they are wearing. Once you have a really good mental picture of the people, write every detail about them you can:',
-	'Please write more about the clothing the people are wearing:',
-	'Please write more about how the people’s faces look:',
-	'Please write more about the people’s appearances:',
-	'Please close your eyes and think about the actions that take place in the event. Think about what the people do and how they do these things. Once you have a really good mental picture of the actions, write them down IN ORDER:',
-	'Please write more about the first action:',
-	'Please write more about the second action:',
-	'Please write more about the third action:'
+	'Close your eyes and think about the location of the event. Think about how things look and how objects are arranged. Once you have a very good picture of the surroundings, write every detail you can (even details that do not seem important)',
+	'Please write more about the objects in the location.',
+	'Please write more about how objects in the location are arranged.',
+	'Please close your eyes and think about the actions that take place in the event. Think about what happens and what people do and how they do these things. Once you have a really good mental picture of the actions, write them down IN ORDER.',
+	'Please write more about the first action.',
+	'Please write more about the second action.',
+	'Please write more about the third action.'
 ];
 var EFT_control_prompts = [
-	'What are your general impressions of the event?',
+	'What are your general impressions of the event? Please write every thought you have (even ones that do not seem important).',
 	'What adjectives would you use to describe the location?',
-	'What adjectives would you use to describe the people in the event?',
-	'What adjectives would you use to describe the things the people in the event do?',
 	'What do you think of the location of the event?',
-	'What do you think of the people in the event?',
-	'What do you think of the things the people in the event do?',
-	'Please describe the whole event in just 2 words',
+	'Please describe the whole event in just 2 words.',
 	'Do you like the event?',
 	'Does the event remind you of anything?',
 	'Are there any other thoughts you have about the event?'
 ];
 var SFT_prompts = [
-	'What are your general impressions of this time of year?',
-	'What adjectives would you use to describe this time of year?',
-	'What do you think of this time of year?',
-	'Please describe the whole event in just 2 words',
-	'Do you like this time of year?',
-	'Does this time of year remind you of anything?',
-	'Are there any other thoughts you have about this time of year?'
+	'What are your general impressions of this upcoming time of year? Please write every thought you have (even ones that do not seem important).',
+	'What adjectives would you use to describe this upcoming time of year?',
+	'What do you think of this upcoming time of year?',
+	'Please describe the upcoming time of year in just 2 words',
+	'Do you like this upcoming time of year?',
+	'Does this upcoming time of year remind you of anything?',
+	'Are there any other thoughts you have about this upcoming time of year?'
 ];
 var EFT_specificity_task = {
 	timeline: [
@@ -234,8 +238,9 @@ if (condition == 1) {
 var dd_instructions = {
 	type: 'instructions',
 	pages: [
-		'Now you will make a series of monetary choices like before',
-		'This time, ' + (condition == 1 ? 'think about the time of year' : 'imagine the event') + ' while you make your decisions',
+		'Now you will make a series of monetary choices like before.',
+		'This time, ' + (condition == 1 ? 'think about the upcoming time of year' : 'imagine the event') + ' while you make your decisions.',
+		'Again, do not think too hard. There are no right or wrong answers.'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000
@@ -277,7 +282,7 @@ var sensory_prompts = [
 var phenomenological_instructions = {
 	type: 'instructions',
 	pages: [
-		'Now you will be asked about what it was</br>like when you were just ' + (condition == 1 ? 'thinking of the time of year' : 'imagining the event')
+		'Now you will be asked about what it was</br>like when you were just ' + (condition == 1 ? 'thinking of the upcoming time of year' : 'imagining the event')
 	],
 	show_clickable_nav: true
 };
@@ -306,10 +311,8 @@ var phenomenological_queries = {
 			})
 		},
 		{
-			labels: ['feels like tomorrow', 'feels far away'],
-			timeline: sensory_prompts.map(function(x) {
-				return {stimulus: '<p style="width: ' + slider_width + ';">My imagination of the ' + (condition == 1 ? 'time of year' : 'event') + ' involved</br>' + x + '</p>'}
-			})
+			labels: ['like tomorrow', 'far away'],
+			[{stimulus: '<p style="width: ' + slider_width + ';">When I ' + (condition == 1 ? 'though about the time of year' : 'imagined the event') + ', it felt</br>' + x + '</p>'}]
 		}
 	]
 };

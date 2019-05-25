@@ -2,7 +2,9 @@
 /*
 To do:
 
-Pilot/proofread
+Write consent form
+Add final screen
+Pilot
 Write R code to analyze data
 */
 
@@ -30,6 +32,11 @@ addWithdrawButton = function() { // Add this to the first timeline element
 	withdrawButton.position = 'absolute';
 	withdrawButton.visibility = 'visible';
 	document.getElementsByTagName("body")[0].appendChild(withdrawButton);
+}
+
+final_screen = function() {
+	// Clear everything and add instructions for receiving credit
+	// Make this function the callback for the withdraw button and the on_finish attribute of the experiment
 }
 
 var timeline = [];

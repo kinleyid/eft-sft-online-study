@@ -2,10 +2,7 @@
 /*
 To do:
 
-Balance number of questions across conditions: maybe remove questions about people
 Add arithmetic filler for sft group?
-Decide how to handle dates:
-	Treat Jan 8, 2020 as the first week of classes
 Pilot/proofread
 Add autonoesis questions?
 Write R code to analyze data
@@ -28,7 +25,6 @@ var today = new Date();
 var fweek = new Date('1/8/2020');
 var diffTime = Math.abs(fweek.getTime() - today.getTime());
 var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-var diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)); 
 
 var timeline = [];
 
@@ -135,7 +131,7 @@ var EFT_instructions = {
 		{
 			type: 'instructions',
 			pages: [
-				'Please think of an event that might happen to you in the first week of classes in the upcoming winter semester.',
+				'Please think of an event that might happen to you in the first week of classes in the upcoming winter semester (the week of January 8, 2020).',
 				'This should be a single event that, if it happens, will happen at a specific time and place.',
 				'The event should not be something that has already happened',
 				'The event can last a few minutes or hours but not longer than a day.',
@@ -154,9 +150,9 @@ var EFT_instructions = {
 var SFT_instructions = {
 	type: 'instructions',
 	pages: [
-		'Please think about the first week of classes in the upcoming winter semester',
-		'Do not think about any event in particular',
-		'You will be asked a series of questions about this upcoming time of year'
+		'Please think about the first week of classes in the upcoming winter semester (the week of January 8, 2020).',
+		'Do not think about any specific event.',
+		'You will be asked a series of questions about this upcoming time of year.'
 	],
 	show_clickable_nav: true
 };
@@ -239,7 +235,7 @@ var dd_instructions = {
 	type: 'instructions',
 	pages: [
 		'Now you will make a series of monetary choices like before.',
-		'This time, ' + (condition == 1 ? 'think about the upcoming time of year' : 'imagine the event') + ' while you make your decisions.',
+		'This time, ' + (condition == 1 ? 'think about the first week of classes in the upcoming winter semester' : 'imagine the event ') + ' while you make your decisions.',
 		'Again, do not think too hard. There are no right or wrong answers.'
 	],
 	show_clickable_nav: true,

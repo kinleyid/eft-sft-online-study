@@ -2,9 +2,7 @@
 /*
 To do:
 
-Add arithmetic filler for sft group?
 Pilot/proofread
-Add autonoesis questions?
 Write R code to analyze data
 */
 
@@ -25,6 +23,14 @@ var today = new Date();
 var fweek = new Date('1/8/2020');
 var diffTime = Math.abs(fweek.getTime() - today.getTime());
 var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+addWithdrawButton = function() { // Add this to the first timeline element
+	withdrawButton = document.createElement('button');
+	withdrawButton.textContent = 'withdraw';
+	withdrawButton.position = 'absolute';
+	withdrawButton.visibility = 'visible';
+	document.getElementsByTagName("body")[0].appendChild(withdrawButton);
+}
 
 var timeline = [];
 
@@ -54,10 +60,10 @@ timeline.push(age, gender);
 var dd_instructions = {
 	type: 'instructions',
 	pages: [
-		'Now you will make a series of monetary choices',
-		'You will be asked whether you would prefer some amount of money now or another amount later',
-		'Click the option that you would choose',
-		'Do not think too hard, just go with your gut'
+		'Now you will make a series of monetary choices.',
+		'You will be asked whether you would prefer some amount of money now or another amount later.',
+		'Click the option that you would choose.',
+		'Do not think too hard, just go with your gut.'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000
@@ -137,7 +143,12 @@ var EFT_instructions = {
 				'The event can last a few minutes or hours but not longer than a day.',
 				'Examples of bad events:</br>1. Commuting to school (Has already happened many times)</br>2. Going to classes (Not specific and takes more than a day)</br>3. Friend starting classes at a different university (Not an event that happens to you)',
 				'Examples of good events:</br>1. Attending my first lecture</br>2. Moving into a new apartment</br>3. Meeting up with someone to buy a used textbook',
-				'Once you have an event in mind that:</br></br>1. Could realistically happen in the first week of the upcoming winter semester</br>2. Happens at a specific time</br>3. Happens at a specific place</br>3. Does not last longer than a day</br>4. Has not happened yet</br></br>Click "next"'
+				'Once you have an event in mind that:</br></br>' +
+				'1. Could realistically happen in the first week of the upcoming winter semester</br>' +
+				'2. Would happen at a specific time</br>' +
+				'3. Would happen at a specific place</br>' +
+				'3. Would not last longer than a day</br>' +
+				'4. Has not happened yet</br></br>Click "next"'
 			],
 			show_clickable_nav: true
 		},
@@ -157,7 +168,7 @@ var SFT_instructions = {
 	show_clickable_nav: true
 };
 var EFT_specificity_prompts = [
-	'Close your eyes and think about the location of the event. Think about how things look and how objects are arranged. Once you have a very good picture of the surroundings, write every detail you can (even details that do not seem important)',
+	'Close your eyes and think about the location of the event. Think about how things look and how objects are arranged. Once you have a very good picture of the surroundings, write every detail you can (even details that do not seem important).',
 	'Please write more about the objects in the location.',
 	'Please write more about how objects in the location are arranged.',
 	'Please close your eyes and think about the actions that take place in the event. Think about what happens and what people do and how they do these things. Once you have a really good mental picture of the actions, write them down IN ORDER.',
@@ -178,7 +189,7 @@ var SFT_prompts = [
 	'What are your general impressions of this upcoming time of year? Please write every thought you have (even ones that do not seem important).',
 	'What adjectives would you use to describe this upcoming time of year?',
 	'What do you think of this upcoming time of year?',
-	'Please describe the upcoming time of year in just 2 words',
+	'Please describe the upcoming time of year in just 2 words.',
 	'Do you like this upcoming time of year?',
 	'Does this upcoming time of year remind you of anything?',
 	'Are there any other thoughts you have about this upcoming time of year?'
@@ -187,7 +198,7 @@ var EFT_specificity_task = {
 	timeline: [
 		{
 			type: 'instructions',
-			pages: ['You will now be asked about details of your event. This is not a test; you are the expert on the event.'],
+			pages: ['You will now be asked about details of your event. This is not a test. You are the expert on the event.'],
 			show_clickable_nav: true
 		}].concat(
 			EFT_specificity_prompts.map(function(x) {
@@ -199,13 +210,19 @@ var EFT_specificity_task = {
 		)
 };
 var EFT_control_task = {
-	type: 'survey-text',
-	timeline: EFT_control_prompts.map(function(x) {
-		return {
-			type: 'survey-text',
-			questions: [{prompt: x, rows: 10}]
-		}
-	})
+	timeline: [
+		{
+			type: 'instructions',
+			pages: ['You will now be asked some questions about the event.'],
+			show_clickable_nav: true
+		}].concat(
+			EFT_specificity_prompts.map(function(x) {
+				return {
+					type: 'survey-text',
+					questions: [{prompt: x, rows: 10}]
+				}
+			})
+		)
 };
 var SFT_task = {
 	type: 'survey-text',
@@ -235,8 +252,8 @@ var dd_instructions = {
 	type: 'instructions',
 	pages: [
 		'Now you will make a series of monetary choices like before.',
-		'This time, ' + (condition == 1 ? 'think about the first week of classes in the upcoming winter semester' : 'imagine the event ') + ' while you make your decisions.',
-		'Again, do not think too hard. There are no right or wrong answers.'
+		'This time, ' + (condition == 1 ? 'think about the upcoming time of year ' : 'imagine the event ') + ' while you make your decisions.',
+		'Again, do not think too hard, just go with your gut.'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000
@@ -249,8 +266,8 @@ timeline.push(
 			dd_data.trial_count = 0;
 			dd_data.immediate_value = 100;
 			dd_data.delayed_value = 200;
-			dd_data.delay_text = condition == 1 ? 'During the first</br>week of winter classes' : 'During the event</br>you are imagining';
-			dd_data.immediate_text = 'Now';
+			dd_data.delay_text = condition == 1 ? 'during the upcoming</br>time of year' : 'during the event</br>you are imagining';
+			dd_data.immediate_text = 'now';
 		}
 	},
 	dd_loop
@@ -308,7 +325,15 @@ var phenomenological_queries = {
 		},
 		{
 			labels: ['like tomorrow', 'far away'],
-			[{stimulus: '<p style="width: ' + slider_width + ';">When I ' + (condition == 1 ? 'though about the time of year' : 'imagined the event') + ', it felt</br>' + x + '</p>'}]
+			stimulus: '<p style="width: ' + slider_width + ';">Sometimes the future can feel like it is coming up very soon even when it is not.</br>Sometimes it can feel a long way off even when it is not.</br></br>When I ' + (condition == 1 ? 'thought about the time of year' : 'imagined the event') + ', it felt</p>'
+		},
+		{
+			labels: ['disagree', 'agree'],
+			stimulus: '<p style="width: ' + slider_width + ';">When I ' + (condition == 1 ? 'thought about the time of year' : 'imagined the event') + ', it felt like I was pre-experiencing it</p>'
+		},
+		{
+			labels: ['first-person', 'third-person'],
+			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view.</br>Sometimes the pictures in our minds are from the perspective of our own eyes (first-person). Other times we see things as if through a security camera (third-person). When I ' + (condition == 1 ? 'thought about the time of year' : 'imagined the event') + ', my visual perspective was</p>'
 		}
 	]
 };
@@ -348,6 +373,8 @@ timeline.push({
   type: 'fullscreen',
   fullscreen_mode: false
 });
+
+timeline[0].on_load = addWithdrawButton;
 
 jsPsych.init({
 	timeline: timeline,

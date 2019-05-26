@@ -2,6 +2,8 @@
 /*
 To do:
 
+Give better instructions on moving the sliders
+Give better instructions for visual perspective question--e.g. mark the middle as half-and-half
 Write consent form
 Add final screen
 Pilot

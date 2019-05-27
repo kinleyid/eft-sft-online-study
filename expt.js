@@ -358,13 +358,14 @@ var data_quality_instructions = {
 	pages: [
 		'Now you will be asked about your</br>experience with this study',
 		'Please move the slider to indicate how much</br>you agree or disagree with the statements',
-		'Please be honest. There will be NO PENATLY</br>based on your answers'
+		'Please be honest. There will be NO PENALTY</br>based on your answers'
 	],
 	show_clickable_nav: true
 };
 data_quality_prompts = [
 	'I read and understood all the instructions and questions',
 	'I took the study seriously',
+	'I found the task difficult',
 	'I was in a quiet place',
 	'Other people looked at my computer screen',
 	'I have talked to other people who also did this study',

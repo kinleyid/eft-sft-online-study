@@ -2,8 +2,6 @@
 /*
 To do:
 
-Give better instructions on moving the sliders
-Give better instructions for visual perspective question--e.g. mark the middle as half-and-half
 Write consent form
 Add final screen
 Pilot
@@ -20,7 +18,7 @@ Conditions:
 var pIDdigs = 100000000;
 var participant_id = Math.floor(pIDdigs + Math.random() * (9 * pIDdigs - 1));
 var condition = Math.floor(1 + Math.random() * 3); // 1, 2, or 3
-var slider_width = '200px'; // Slider width for visual analog scales
+var slider_width = '250px'; // Slider width for visual analog scales
 
 // Time between today and first week of classes:
 var today = new Date();
@@ -304,7 +302,10 @@ var sensory_prompts = [
 var phenomenological_instructions = {
 	type: 'instructions',
 	pages: [
-		'Now you will be asked about what it was</br>like when you were just ' + (condition == 1 ? 'thinking of the upcoming time of year' : 'imagining the event')
+		'Now you will be asked about what it was</br>like when you were just ' + (condition == 1 ? 'thinking of the upcoming time of year' : 'imagining the event') + '.',
+		'Move the slider to select your answers.',
+		'Move the slider more to one side if you</br>agree more strongly with the answer on that side.',
+		'Move the slider all the way to one side</br>if you agree 100% with the answer on that side.'
 	],
 	show_clickable_nav: true
 };
@@ -356,7 +357,7 @@ var data_quality_instructions = {
 	type: 'instructions',
 	pages: [
 		'Now you will be asked about your</br>experience with this study',
-		'Please move the slider to indicate whether</br>you agree or disagree with the statements',
+		'Please move the slider to indicate how much</br>you agree or disagree with the statements',
 		'Please be honest. There will be NO PENATLY</br>based on your answers'
 	],
 	show_clickable_nav: true

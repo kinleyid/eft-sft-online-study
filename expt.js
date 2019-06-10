@@ -11,14 +11,13 @@ Write R code to analyze data
 
 /*
 Conditions:
-1 = baseline UPDATE 2019-06-10: REMOVED
+1 = episodic specificity
 2 = episodic control
-3 = episodic specificity
 */
 
 var pIDdigs = 100000000;
 var participant_id = Math.floor(pIDdigs + Math.random() * (9 * pIDdigs - 1));
-var condition = Math.floor(2 + Math.random() * 2); // 2 or 3
+var condition = Math.floor(1 + Math.random() * 2); // 1 or 2
 var slider_width = '250px'; // Slider width for visual analog scales
 
 // Time between today and first week of classes:
@@ -215,10 +214,10 @@ var EFT_control_task = {
 		)
 };
 timeline.push(EFT_instructions)
-if (condition == 2) {
-	timeline.push(EFT_control_task)
-} else {
+if (condition == 1) {
 	timeline.push(EFT_specificity_task)
+} else {
+	timeline.push(EFT_control_task)
 }
 /*
 
@@ -243,7 +242,7 @@ timeline.push(
 			dd_data.trial_count = 0;
 			dd_data.immediate_value = 100;
 			dd_data.delayed_value = 200;
-			dd_data.delay_text = condition == 1 ? 'during the upcoming</br>time of year' : 'during the event</br>you are imagining';
+			dd_data.delay_text = 'during the event</br>you are imagining';
 			dd_data.immediate_text = 'now';
 		}
 	},

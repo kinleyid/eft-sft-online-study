@@ -2,6 +2,7 @@
 /*
 To do:
 
+Visual perspective: make it completely first-person - both equally - completely third-person
 Write consent form
 Add final screen
 Pilot
@@ -10,14 +11,14 @@ Write R code to analyze data
 
 /*
 Conditions:
-1 = baseline
+1 = baseline UPDATE 2019-06-10: REMOVED
 2 = episodic control
 3 = episodic specificity
 */
 
 var pIDdigs = 100000000;
 var participant_id = Math.floor(pIDdigs + Math.random() * (9 * pIDdigs - 1));
-var condition = Math.floor(1 + Math.random() * 3); // 1, 2, or 3
+var condition = Math.floor(2 + Math.random() * 2); // 2 or 3
 var slider_width = '250px'; // Slider width for visual analog scales
 
 // Time between today and first week of classes:
@@ -165,15 +166,6 @@ var EFT_instructions = {
 		}
 	]
 };
-var SFT_instructions = {
-	type: 'instructions',
-	pages: [
-		'Please think about the first week of classes in the upcoming winter semester (the week of January 8, 2020).',
-		'Do not think about any specific event.',
-		'You will be asked a series of questions about this upcoming time of year.'
-	],
-	show_clickable_nav: true
-};
 var EFT_specificity_prompts = [
 	'Close your eyes and think about the location of the event. Think about how things look and how objects are arranged. Once you have a very good picture of the surroundings, write every detail you can (even details that do not seem important).',
 	'Please write more about the objects in the location.',
@@ -191,15 +183,6 @@ var EFT_control_prompts = [
 	'Do you like the event?',
 	'Does the event remind you of anything?',
 	'Are there any other thoughts you have about the event?'
-];
-var SFT_prompts = [
-	'What are your general impressions of this upcoming time of year? Please write every thought you have (even ones that do not seem important).',
-	'What adjectives would you use to describe this upcoming time of year?',
-	'What do you think of this upcoming time of year?',
-	'Please describe the upcoming time of year in just 2 words.',
-	'Do you like this upcoming time of year?',
-	'Does this upcoming time of year remind you of anything?',
-	'Are there any other thoughts you have about this upcoming time of year?'
 ];
 var EFT_specificity_task = {
 	timeline: [
@@ -231,24 +214,11 @@ var EFT_control_task = {
 			})
 		)
 };
-var SFT_task = {
-	type: 'survey-text',
-	timeline: SFT_prompts.map(function(x) {
-		return {
-			type: 'survey-text',
-			questions: [{prompt: x, rows: 10}]
-		}
-	})
-};
-if (condition == 1) {
-	timeline.push(SFT_instructions, SFT_task)
+timeline.push(EFT_instructions)
+if (condition == 2) {
+	timeline.push(EFT_control_task)
 } else {
-	timeline.push(EFT_instructions)
-	if (condition == 2) {
-		timeline.push(EFT_control_task)
-	} else {
-		timeline.push(EFT_specificity_task)
-	}
+	timeline.push(EFT_specificity_task)
 }
 /*
 
@@ -259,7 +229,7 @@ var dd_instructions = {
 	type: 'instructions',
 	pages: [
 		'Now you will make a series of monetary choices like before.',
-		'This time, ' + (condition == 1 ? 'think about the upcoming time of year ' : 'imagine the event ') + ' while you make your decisions.',
+		'This time, imagine the event while you make your decisions.',
 		'Again, do not think too hard, just go with your gut.'
 	],
 	show_clickable_nav: true,
@@ -302,7 +272,7 @@ var sensory_prompts = [
 var phenomenological_instructions = {
 	type: 'instructions',
 	pages: [
-		'Now you will be asked about what it was</br>like when you were just ' + (condition == 1 ? 'thinking of the upcoming time of year' : 'imagining the event') + '.',
+		'Now you will be asked about what it was</br>like when you were just imagining the event.',
 		'Move the slider to select your answers.',
 		'Move the slider more to one side if you</br>agree more strongly with the answer on that side.',
 		'Move the slider all the way to one side</br>if you agree 100% with the answer on that side.'
@@ -314,15 +284,15 @@ var phenomenological_queries = {
 	post_trial_gap: 200,
 	timeline: [
 		{
-			stimulus: '<p style="width: ' + slider_width + ';">The general tone of the ' + (condition == 1 ? 'time of year' : 'event') + ' was</p>',
+			stimulus: '<p style="width: ' + slider_width + ';">The general tone of the event was</p>',
 			labels: ['negative', 'positive']
 		},
 		{
-			stimulus: '<p style="width: ' + slider_width + ';">The emotions associated with the ' + (condition == 1 ? 'time of year' : 'event') + ' were</p>',
+			stimulus: '<p style="width: ' + slider_width + ';">The emotions associated with the event were</p>',
 			labels: ['not intense', 'very intense']
 		},
 		{
-			stimulus: '<p style="width: ' + slider_width + ';">While I was ' + (condition == 1 ? 'thinking of the time of year' : 'imagining the event') + ', it was</p>',
+			stimulus: '<p style="width: ' + slider_width + ';">While I was imagining the event, it was</p>',
 			timeline: vividness_adjectives.map(function(x) {
 				return {labels: x}
 			})
@@ -330,20 +300,20 @@ var phenomenological_queries = {
 		{
 			labels: ['none', 'a lot'],
 			timeline: sensory_prompts.map(function(x) {
-				return {stimulus: '<p style="width: ' + slider_width + ';">My imagination of the ' + (condition == 1 ? 'time of year' : 'event') + ' involved</br>' + x + '</p>'}
+				return {stimulus: '<p style="width: ' + slider_width + ';">My imagination of the event involved</br>' + x + '</p>'}
 			})
 		},
 		{
 			labels: ['like tomorrow', 'far away'],
-			stimulus: '<p style="width: ' + slider_width + ';">Sometimes the future can feel like it is coming up very soon even when it is not.</br>Sometimes it can feel a long way off even when it is not.</br></br>When I ' + (condition == 1 ? 'thought about the time of year' : 'imagined the event') + ', it felt</p>'
+			stimulus: '<p style="width: ' + slider_width + ';">Sometimes the future can feel like it is coming up very soon even when it is not.</br>Sometimes it can feel a long way off even when it is not.</br></br>When I imagined the event, it felt</p>'
 		},
 		{
 			labels: ['disagree', 'agree'],
-			stimulus: '<p style="width: ' + slider_width + ';">When I ' + (condition == 1 ? 'thought about the time of year' : 'imagined the event') + ', it felt like I was pre-experiencing it</p>'
+			stimulus: '<p style="width: ' + slider_width + ';">When I imagined the event, it felt like I was pre-experiencing it</p>'
 		},
 		{
 			labels: ['first-person', 'third-person'],
-			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view.</br>Sometimes the pictures in our minds are from the perspective of our own eyes (first-person). Other times we see things as if through a security camera (third-person). When I ' + (condition == 1 ? 'thought about the time of year' : 'imagined the event') + ', my visual perspective was</p>'
+			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view.</br>Sometimes the pictures in our minds are from the perspective of our own eyes (first-person). Other times we see things as if through a security camera (third-person). When I imagined the event, my visual perspective was</p>'
 		}
 	]
 };

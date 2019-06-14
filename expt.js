@@ -2,9 +2,12 @@
 /*
 To do:
 
+Put withdraw button at the top left corner
+Make only positive or neutral events
 Visual perspective: make it completely first-person - both equally - completely third-person
 Write consent form
-Add final screen
+Write debriefing form
+Write function that withdraw button runs
 Pilot
 Write R code to analyze data
 */

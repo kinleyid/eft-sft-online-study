@@ -2,6 +2,7 @@
 /*
 To do:
 
+Alter time to make it just a date (money in xyz days, imagine an event on Wednesday, January X, 20XX, money during the event you are imagining)
 Put withdraw button at the top left corner
 Make only positive or neutral events
 Visual perspective: make it completely first-person - both equally - completely third-person

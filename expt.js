@@ -2,11 +2,7 @@
 /*
 To do:
 
-Put the visual perspective question first
-Alter time to make it just a date (money in xyz days, imagine an event on Wednesday, January X, 20XX, money during the event you are imagining)
-Put withdraw button at the top left corner
 Make only positive or neutral events
-Visual perspective: make it completely first-person - both equally - completely third-person
 Write consent form
 Write debriefing form
 Write function that withdraw button runs
@@ -23,13 +19,13 @@ Conditions:
 var pIDdigs = 100000000;
 var participant_id = Math.floor(pIDdigs + Math.random() * (9 * pIDdigs - 1));
 var condition = Math.floor(1 + Math.random() * 2); // 1 or 2
-var slider_width = '250px'; // Slider width for visual analog scales
+var slider_width = '300px'; // Slider width for visual analog scales
 
 // Time between today and first week of classes:
 var today = new Date();
-var fweek = new Date('1/8/2020');
-var diffTime = Math.abs(fweek.getTime() - today.getTime());
-var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+var diffDays = 30*2;
+var delayedDate = new Date();
+delayedDate.setDate(delayedDate.getDate() + diffDays);
 
 addWithdrawButton = function() { // Add this to the first timeline element
 	withdrawButton = document.createElement('button');
@@ -45,7 +41,29 @@ final_screen = function() {
 }
 
 var timeline = [];
-
+/*
+	Consent
+*/
+var save_email = function(elem) {
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", 'saveData.php', true);
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+	xhr.onreadystatechange = function() { // Call a function when the state changes.
+		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+		}
+	}
+	xhr.send("pID=zEmail&txt=" + document.getElementById('pEmail').value);
+	return true;
+};
+timeline.push({
+	type: 'external-html',
+	url: "consent.html",
+	cont_btn: "start",
+	check_fn: save_email
+});
+/*
+	Set fullscreen
+*/
 timeline.push({ // Set the user's screen to fullscreen
 	type: 'fullscreen',
 	fullscreen_mode: true
@@ -74,8 +92,7 @@ var dd_instructions = {
 	pages: [
 		'Now you will make a series of monetary choices.',
 		'You will be asked whether you would prefer some amount of money now or another amount later.',
-		'Click the option that you would choose.',
-		'Do not think too hard, just go with your gut.'
+		'Click the option that you would choose.'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000
@@ -149,12 +166,12 @@ var EFT_instructions = {
 		{
 			type: 'instructions',
 			pages: [
-				'Please think of an event that might happen to you in the first week of classes in the upcoming winter semester (the week of January 8, 2020).',
+				'Please think of an event that might happen to you on ' + delayedDate.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}),
 				'This should be a single event that, if it happens, will happen at a specific time and place.',
 				'The event should not be something that has already happened',
 				'The event can last a few minutes or hours but not longer than a day.',
 				'Examples of bad events:</br>1. Commuting to school (Has already happened many times)</br>2. Going to classes (Not specific and takes more than a day)</br>3. Friend starting classes at a different university (Not an event that happens to you)',
-				'Examples of good events:</br>1. Attending my first lecture</br>2. Moving into a new apartment</br>3. Meeting up with someone to buy a used textbook',
+				'Examples of good events:</br>1. Running into an old friend</br>2. Moving into a new apartment</br>3. Meeting up with someone to buy a used textbook',
 				'Once you have an event in mind that:</br></br>' +
 				'1. Could realistically happen in the first week of the upcoming winter semester</br>' +
 				'2. Would happen at a specific time</br>' +
@@ -288,6 +305,10 @@ var phenomenological_queries = {
 	post_trial_gap: 200,
 	timeline: [
 		{
+			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view.</br>Sometimes the pictures in our minds are from the perspective of our own eyes (first-person). Other times we see things as if through a security camera (third-person). When I imagined the event, my visual perspective was</p>',
+			labels: ['completely first-person', 'both equally', 'completely third-person'],
+		},
+		{
 			stimulus: '<p style="width: ' + slider_width + ';">The general tone of the event was</p>',
 			labels: ['negative', 'positive']
 		},
@@ -314,10 +335,6 @@ var phenomenological_queries = {
 		{
 			labels: ['disagree', 'agree'],
 			stimulus: '<p style="width: ' + slider_width + ';">When I imagined the event, it felt like I was pre-experiencing it</p>'
-		},
-		{
-			labels: ['first-person', 'third-person'],
-			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view.</br>Sometimes the pictures in our minds are from the perspective of our own eyes (first-person). Other times we see things as if through a security camera (third-person). When I imagined the event, my visual perspective was</p>'
 		}
 	]
 };
@@ -364,6 +381,12 @@ timeline[0].on_load = addWithdrawButton;
 jsPsych.init({
 	timeline: timeline,
 	on_finish: function() { // Save data
+		var ifrm = document.createElement("iframe");
+        ifrm.style.width = "0px";
+        ifrm.style.height = "0px";
+        ifrm.style.border = "0px";
+		ifrm.name = 'curriframe';
+        document.body.appendChild(ifrm);
 		var form = document.createElement('form');
 		document.body.appendChild(form);
 		form.method = 'post';

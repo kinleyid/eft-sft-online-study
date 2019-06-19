@@ -23,7 +23,29 @@ var diffDays = 30*2;
 var delayedDate = new Date();
 delayedDate.setDate(delayedDate.getDate() + diffDays);
 
-final_screen = function(initialMessage) {
+saving_options = function(initialMessage) {
+	var body = document.getElementsByTagName("BODY")[0];
+	body.innerHTML = '<center><p>' + initialMessage + '</center></p>';
+	
+	var keepDataButton = document.createElement('button');
+	keepDataButton.textContent = 'Keep my data';
+	keepDataButton.visibility = 'visible';
+	keepDataButton.onclick = save_data;
+	body.appendChild(keepDataButton);
+	
+	var br = document.createElement("BR");
+	body.appendChild(br);
+	
+	var discardDataButton = document.createElement('button');
+	discardDataButton.textContent = 'Delete my data';
+	discardDataButton.visibility = 'visible';
+	discardDataButton.style.color = 'red';
+	discardDataButton.onclick = function() {
+		window.location.href = "end.html";
+	}
+	body.appendChild(discardDataButton);
+}
+final_screen = function() {
 	// Clear everything and add instructions for receiving credit
 	// Make this function the callback for the withdraw button and the on_finish attribute of the experiment
 	try {
@@ -32,15 +54,14 @@ final_screen = function(initialMessage) {
 		var dontDoAnything;
 	}
 	body = document.getElementsByTagName("BODY")[0];
-	body.innerHTML = '<center><p>' + initialMessage + '</p></center>';
-	body.innerHTML = body.innerHTML + '<center><p>Email Morgan Porteous <porteoum@mcmaster.ca> with the subject line "SONA participation" to obtain your credit.</p><p>You may now close this tab.</p></center>';
+	body.innerHTML = '<center><p>Using the same email linked to your SONA account (probably your McMaster email), contact Morgan Porteous <porteoum@mcmaster.ca> with the subject line "SONA participation" to obtain your credit.</p><p>You may now close this tab.</p></center>';
 }
 addWithdrawButton = function() { // Add this to the first timeline element
 	withdrawButton = document.createElement('button');
 	withdrawButton.textContent = 'withdraw';
 	withdrawButton.position = 'absolute';
 	withdrawButton.visibility = 'visible';
-	withdrawButton.onclick = function() {final_screen('You have withdrawn from the study. Your data will not be saved.')};
+	withdrawButton.onclick = function() {saving_options('You have withdrawn from the study')};
 	document.getElementsByTagName("body")[0].appendChild(withdrawButton);
 }
 
@@ -48,7 +69,7 @@ var timeline = [];
 /*
 	Consent
 */
-var save_email = function(elem) {
+save_email = function(elem) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", 'saveData.php', true);
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -59,6 +80,25 @@ var save_email = function(elem) {
 	xhr.send("pID=zEmail&txt=" + document.getElementById('pEmail').value);
 	return true;
 };
+save_data = function() {
+	var form = document.createElement('form');
+	document.body.appendChild(form);
+	form.method = 'post';
+	form.action = 'saveData.php';
+	var data = {
+		txt: jsPsych.data.get().csv(),
+		pID: participant_id
+	}
+	var name;
+	for (name in data) {
+		var input = document.createElement('input');
+		input.type = 'hidden';
+		input.name = name;
+		input.value = data[name];
+		form.appendChild(input);
+	}
+	form.submit();
+}
 timeline.push({
 	type: 'external-html',
 	url: "consent.html",
@@ -384,30 +424,7 @@ timeline[0].on_load = addWithdrawButton;
 
 jsPsych.init({
 	timeline: timeline,
-	on_finish: function() { // Save data
-		var ifrm = document.createElement("iframe");
-        ifrm.style.width = "0px";
-        ifrm.style.height = "0px";
-        ifrm.style.border = "0px";
-		ifrm.name = 'curriframe';
-        document.body.appendChild(ifrm);
-		var form = document.createElement('form');
-		document.body.appendChild(form);
-		form.method = 'post';
-		form.action = 'saveData.php';
-		var data = {
-			txt: jsPsych.data.get().csv(),
-			pID: participant_id
-		}
-		var name;
-		for (name in data) {
-			var input = document.createElement('input');
-			input.type = 'hidden';
-			input.name = name;
-			input.value = data[name];
-			form.appendChild(input);
-		}
-		form.submit();
-		final_screen('Thank you for participating!');
+	on_finish: function() {
+		saving_options('Thank you for participating!');
 	}
 });

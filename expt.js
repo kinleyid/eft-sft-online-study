@@ -2,7 +2,6 @@
 /*
 To do:
 
-Write function that withdraw button runs
 Pilot
 Write R code to analyze data
 */
@@ -24,17 +23,25 @@ var diffDays = 30*2;
 var delayedDate = new Date();
 delayedDate.setDate(delayedDate.getDate() + diffDays);
 
+final_screen = function(initialMessage) {
+	// Clear everything and add instructions for receiving credit
+	// Make this function the callback for the withdraw button and the on_finish attribute of the experiment
+	try {
+		document.exitFullscreen();
+	} catch(err) {
+		var dontDoAnything;
+	}
+	body = document.getElementsByTagName("BODY")[0];
+	body.innerHTML = '<center><p>' + initialMessage + '</p></center>';
+	body.innerHTML = body.innerHTML + '<center><p>Email Morgan Porteous <porteoum@mcmaster.ca> with the subject line "SONA participation" to obtain your credit.</p><p>You may now close this tab.</p></center>';
+}
 addWithdrawButton = function() { // Add this to the first timeline element
 	withdrawButton = document.createElement('button');
 	withdrawButton.textContent = 'withdraw';
 	withdrawButton.position = 'absolute';
 	withdrawButton.visibility = 'visible';
+	withdrawButton.onclick = function() {final_screen('You have withdrawn from the study. Your data will not be saved.')};
 	document.getElementsByTagName("body")[0].appendChild(withdrawButton);
-}
-
-final_screen = function() {
-	// Clear everything and add instructions for receiving credit
-	// Make this function the callback for the withdraw button and the on_finish attribute of the experiment
 }
 
 var timeline = [];
@@ -401,5 +408,6 @@ jsPsych.init({
 			form.appendChild(input);
 		}
 		form.submit();
+		final_screen('Thank you for participating!');
 	}
 });

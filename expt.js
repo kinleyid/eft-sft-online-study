@@ -2,9 +2,6 @@
 /*
 To do:
 
-Make only positive or neutral events
-Write consent form
-Write debriefing form
 Write function that withdraw button runs
 Pilot
 Write R code to analyze data

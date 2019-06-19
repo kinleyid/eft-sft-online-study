@@ -136,7 +136,7 @@ var dd_instructions = {
 	pages: [
 		'Now you will make a series of monetary choices.',
 		'You will be asked whether you would prefer some amount of money now or another amount later.',
-		'Click the option that you would choose.'
+		'Click the option that you would choose. There are no right or wrong answers.'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000

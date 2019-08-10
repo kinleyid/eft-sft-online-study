@@ -1,27 +1,26 @@
-
-/*
-To do:
-
-Pilot
-Write R code to analyze data
-*/
-
-/*
-Conditions:
-1 = episodic specificity
-2 = episodic control
-*/
-
 var pIDdigs = 100000000;
 var participant_id = Math.floor(pIDdigs + Math.random() * (9 * pIDdigs - 1));
 var condition = Math.floor(1 + Math.random() * 2); // 1 or 2
 var slider_width = '300px'; // Slider width for visual analog scales
-
+var mon_order = Math.floor(1 + Math.random() * 2); // 1 or 2
 // Time between today and first week of classes:
 var today = new Date();
 var diffDays = 30*2;
 var delayedDate = new Date();
 delayedDate.setDate(delayedDate.getDate() + diffDays);
+var EVENT_NAME = ''; // User's brief title for their event
+
+jsPsych.data.addProperties({
+	participant_id: participant_id,
+	condition: condition,
+	mon_order: mon_order,
+	delayed_date: delayedDate
+});
+
+var mon_amts = [[50, 100], [100, 200]];
+if (mon_order == 2) {
+	mon_amts.reverse();
+}
 
 saving_options = function(initialMessage) {
 	var body = document.getElementsByTagName("BODY")[0];
@@ -119,7 +118,8 @@ timeline.push({ // Set the user's screen to fullscreen
 */
 var age = {
 	type: 'survey-text',
-	questions: [{prompt: 'What is your date of birth? (YYYY/MM/DD)'}]
+	questions: [{prompt: 'What is your age in years?'}],
+	post_trial_gap: 100
 };
 var gender = {
 	type: 'survey-multi-choice',
@@ -142,8 +142,8 @@ var dd_instructions = {
 	post_trial_gap: 1000
 };
 var dd_data = {
-	immediate_value: 50,
-	delayed_value: 100,
+	immediate_value: mon_amts[0][0],
+	delayed_value: mon_amts[0][1],
 	delay_text: 'in ' + diffDays + ' days',
 	immediate_text: 'now',
 	div_pre: '<div style="height: 100px; width: 150px;">',
@@ -152,7 +152,14 @@ var dd_data = {
 };
 var dd_trial = {
 	type: 'html-button-response',
-	stimulus: '',
+	stimulus: function() {
+		var retval = EVENT_NAME;
+		if (retval != '') {
+			retval = 'Imagine ' + retval;
+		}
+		retval = retval + '</br></br>';
+		return retval;
+	},
 	choices: ['', ''],
 	post_trial_gap: 500,
 	data: {},
@@ -214,10 +221,10 @@ var EFT_instructions = {
 				'This should be a single event that, if it happens, will happen at a specific time and place.',
 				'The event should not be something that has already happened',
 				'The event can last a few minutes or hours but not longer than a day.',
-				'Examples of bad events:</br>1. Commuting to school (Has already happened many times)</br>2. Going to classes (Not specific and takes more than a day)</br>3. Friend starting classes at a different university (Not an event that happens to you)',
-				'Examples of good events:</br>1. Running into an old friend</br>2. Moving into a new apartment</br>3. Meeting up with someone to buy a used textbook',
+				'Examples of events that are NOT appropriate for this study:</br>1. Commuting to school (Has already happened many times)</br>2. Going to classes (Not specific and takes more than a day)</br>3. Friend starting classes at a different university (Not an event that happens to you)',
+				'Examples of events that ARE appropriate for this study:</br>1. Running into an old friend</br>2. Moving into a new apartment</br>3. Meeting up with someone to buy a used textbook',
 				'Once you have an event in mind that:</br></br>' +
-				'1. Could realistically happen in the first week of the upcoming winter semester</br>' +
+				'1. Could realistically happen to you on ' + delayedDate.toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}) + '</br>' +
 				'2. Would happen at a specific time</br>' +
 				'3. Would happen at a specific place</br>' +
 				'3. Would not last longer than a day</br>' +
@@ -227,7 +234,11 @@ var EFT_instructions = {
 		},
 		{
 			type: 'survey-text',
-			questions: [{prompt: 'Please write a brief title for your event'}]
+			questions: [{prompt: 'Please write a brief title for your event'}],
+			on_finish: function(data) {
+				var resp = JSON.parse(data.responses);
+				EVENT_NAME = resp.Q0;
+			}
 		}
 	]
 };
@@ -235,10 +246,10 @@ var EFT_specificity_prompts = [
 	'Close your eyes and think about the location of the event. Think about how things look and how objects are arranged. Once you have a very good picture of the surroundings, write every detail you can (even details that do not seem important).',
 	'Please write more about the objects in the location.',
 	'Please write more about how objects in the location are arranged.',
-	'Please close your eyes and think about the actions that take place in the event. Think about what happens and what people do and how they do these things. Once you have a really good mental picture of the actions, write them down IN ORDER.',
-	'Please write more about the first action.',
-	'Please write more about the second action.',
-	'Please write more about the third action.'
+	'Please close your eyes and think about the things that happen during the event. Think about what happens and what people do and how they do these things. Once you have a really good mental picture of the things that happen, write them down IN ORDER.',
+	'Please write more about the first thing that happens.',
+	'Please write more about the second thing that happens.',
+	'Please write more about the third thing that happens.'
 ];
 var EFT_control_prompts = [
 	'What are your general impressions of the event? Please write every thought you have (even ones that do not seem important).',
@@ -249,42 +260,37 @@ var EFT_control_prompts = [
 	'Does the event remind you of anything?',
 	'Are there any other thoughts you have about the event?'
 ];
-var EFT_specificity_task = {
-	timeline: [
-		{
-			type: 'instructions',
-			pages: ['You will now be asked about details of your event. This is not a test. You are the expert on the event.'],
-			show_clickable_nav: true
-		}].concat(
-			EFT_specificity_prompts.map(function(x) {
-				return {
-					type: 'survey-text',
-					questions: [{prompt: x, rows: 10}]
-				}
-			})
-		)
-};
-var EFT_control_task = {
-	timeline: [
-		{
-			type: 'instructions',
-			pages: ['You will now be asked some questions about the event.'],
-			show_clickable_nav: true
-		}].concat(
-			EFT_specificity_prompts.map(function(x) {
-				return {
-					type: 'survey-text',
-					questions: [{prompt: x, rows: 10}]
-				}
-			})
-		)
-};
-timeline.push(EFT_instructions)
+var prompts, pages;
 if (condition == 1) {
-	timeline.push(EFT_specificity_task)
+	prompts = EFT_specificity_prompts;
+	pages = ['You will now be asked about details of your event. This is not a test. You are the expert on the event.'];
 } else {
-	timeline.push(EFT_control_task)
+	prompts = EFT_control_prompts;
+	pages = ['You will now be asked some questions about the event.'];
 }
+
+timeline.push(EFT_instructions);
+timeline.push({ // EFT prompts
+	timeline: [
+		{
+			type: 'instructions',
+			pages: pages,
+			show_clickable_nav: true
+		}].concat(
+			prompts.map(function(x) {
+				return {
+					type: 'survey-text',
+					questions: [{
+						prompt: x,
+						rows: 10,
+					}],
+					data: {
+						question: x
+					}
+				}
+			})
+		)
+});
 /*
 
 	SECOND DELAY DISCOUNTING TASK
@@ -294,8 +300,8 @@ var dd_instructions = {
 	type: 'instructions',
 	pages: [
 		'Now you will make a series of monetary choices like before.',
-		'This time, imagine the event while you make your decisions.',
-		'Again, do not think too hard, just go with your gut.'
+		'This time, imagine the event you were just writing about while you make your decisions.',
+		'Again, there are no right or wrong answers. Click the option you would choose.'
 	],
 	show_clickable_nav: true,
 	post_trial_gap: 1000
@@ -306,8 +312,8 @@ timeline.push(
 		type: 'call-function',
 		func: function() {
 			dd_data.trial_count = 0;
-			dd_data.immediate_value = 100;
-			dd_data.delayed_value = 200;
+			dd_data.immediate_value = mon_amts[1][0];
+			dd_data.delayed_value = mon_amts[1][1];
 			dd_data.delay_text = 'during the event</br>you are imagining';
 			dd_data.immediate_text = 'now';
 		}
@@ -349,36 +355,59 @@ var phenomenological_queries = {
 	post_trial_gap: 200,
 	timeline: [
 		{
-			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view.</br>Sometimes the pictures in our minds are from the perspective of our own eyes (first-person). Other times we see things as if through a security camera (third-person). When I imagined the event, my visual perspective was</p>',
+			stimulus: '<p style="width: ' + slider_width + ';">We can see things in our minds from different points of view. Sometimes the pictures in our minds are from the perspective of our own eyes (first-person: you are looking out at your surroundings through your own eyes). Other times we see things from an observer\'s visual perspective (third-person: you can actually see yourself, as well as your surroundings).</br></br>When you imagined the event, your visual perspective was</p>',
 			labels: ['completely first-person', 'both equally', 'completely third-person'],
+			data: {
+				right_label: 'completely third-person'
+			}
 		},
 		{
 			stimulus: '<p style="width: ' + slider_width + ';">The general tone of the event was</p>',
-			labels: ['negative', 'positive']
+			labels: ['negative', 'positive'],
+			data: {
+				right_label: 'positive'
+			}
 		},
 		{
 			stimulus: '<p style="width: ' + slider_width + ';">The emotions associated with the event were</p>',
-			labels: ['not intense', 'very intense']
+			labels: ['not intense', 'very intense'],
+			data: {
+				right_label: 'very intense'
+			}
 		},
 		{
-			stimulus: '<p style="width: ' + slider_width + ';">While I was imagining the event, it was</p>',
+			stimulus: '<p style="width: ' + slider_width + ';">While you were imagining the event, your mental image was</p>',
 			timeline: vividness_adjectives.map(function(x) {
-				return {labels: x}
+				return {
+					labels: x,
+					data: {
+						right_label: x[1]
+					}
+				}
 			})
 		},
 		{
 			labels: ['none', 'a lot'],
+			data: {
+				right_label: 'a lot'
+			},
 			timeline: sensory_prompts.map(function(x) {
-				return {stimulus: '<p style="width: ' + slider_width + ';">My imagination of the event involved</br>' + x + '</p>'}
+				return {stimulus: '<p style="width: ' + slider_width + ';">Your imagination of the event involved</br>' + x + '</p>'}
 			})
 		},
 		{
 			labels: ['like tomorrow', 'far away'],
-			stimulus: '<p style="width: ' + slider_width + ';">Sometimes the future can feel like it is coming up very soon even when it is not.</br>Sometimes it can feel a long way off even when it is not.</br></br>When I imagined the event, it felt</p>'
+			stimulus: '<p style="width: ' + slider_width + ';">Sometimes the future can feel like it is coming up very soon even when it is not.</br>Sometimes it can feel a long way off even when it is not.</br></br>When you imagined the event, it felt</p>',
+			data: {
+				right_label: 'far away'
+			}
 		},
 		{
 			labels: ['disagree', 'agree'],
-			stimulus: '<p style="width: ' + slider_width + ';">When I imagined the event, it felt like I was pre-experiencing it</p>'
+			stimulus: '<p style="width: ' + slider_width + ';">When you imagined the event, it felt like you were pre-experiencing it</p>',
+			data: {
+				right_label: 'agree'
+			}
 		}
 	]
 };
@@ -400,7 +429,7 @@ var data_quality_instructions = {
 data_quality_prompts = [
 	'I read and understood all the instructions and questions',
 	'I took the study seriously',
-	'I found the task difficult',
+	'I found the tasks difficult',
 	'I was in a quiet place',
 	'Other people looked at my computer screen',
 	'I have talked to other people who also did this study',
@@ -409,6 +438,9 @@ data_quality_prompts = [
 var data_quality_check = {
 	type: 'html-slider-response',
 	labels: ['disagree', 'agree'],
+	data: {
+		right_label: 'agree'
+	},
 	timeline: data_quality_prompts.map(function(x) {
 		return {stimulus: '<p style="width: ' + slider_width + ';">' + x + '</p>'}
 	})
